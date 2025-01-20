@@ -3,21 +3,37 @@ namespace Dvt.ElevatorSimulator;
 public abstract class Elevator
 {
     protected object lockObject;
-    private int? DestinationFloor { get; set; }
+    public int? DestinationFloor { get; set; }
     private bool IsRunning { get; set; }
+    public int MaxCapacity { get; private set; }
     public int Number { get; private set; }
     public ElevatorTypes ElevatorType { get; private set; }
-    public int NumberOfFloors { get; private set; }
     public int CurrentFloor { get; private set; }
     public ElevatorDirection Direction { get; private set; }
 
-    public abstract bool IsOverloaded { get; }
+    public abstract bool HasFullCapacity { get; }
     private Thread ElevatorThread { get; set; }
     
-    protected Elevator(ElevatorTypes elevatorType, int number, int numberOfFloors)
+    protected Elevator(ElevatorTypes elevatorType, int number, int maxCapacity)
     {
+        if (elevatorType == ElevatorTypes.Unknown)
+        {
+            throw new ArgumentException("Invalid elevator type.");
+        }
+
+        if (number < 1)
+        {
+            throw new ArgumentException("Elevator number must be greater than 0.");
+        }
+
+        if (maxCapacity < 1)
+        {
+            throw new ArgumentException("Elevator max capacity must be greater than 0.");
+        }
+
         lockObject = new object();
         Number = number;
+        MaxCapacity = maxCapacity;
         ElevatorType = elevatorType;
         CurrentFloor = 1;
         Direction = ElevatorDirection.Stationary;
